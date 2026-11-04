@@ -1,12 +1,15 @@
-using UnityEngine;
+using System;
 using TMPro;
+using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
     [Header("Estado inicial")]
     [SerializeField] private int dia = 1;
     [SerializeField] private int comida = 30;
-    [SerializeField] private int moradores = 6;
+
+    [Header("Tarefas")]
+    [SerializeField] private int comidaPorBusca = 4;
 
     [Header("Interface")]
     [SerializeField] private TMP_Text textoDia;
@@ -14,33 +17,79 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TMP_Text textoMoradores;
     [SerializeField] private TMP_Text textoRelatorio;
 
+    private Morador[] moradores =
+    {
+        new Morador("Ana", 1),
+        new Morador("Bruno", 1),
+        new Morador("Carla", 2),
+        new Morador("Diego", 2),
+        new Morador("Eva", 3),
+        new Morador("Felipe", 3)
+    };
+
+    public event Action EstadoAtualizado;
+
     private void Start()
     {
-        AtualizarInterface();
-
         textoRelatorio.text =
-            "Cada morador precisa de 1 unidade de comida por dia.";
+            "Selecione um andar e distribua as tarefas.\n\n" +
+            $"Cada busca traz {comidaPorBusca} unidades de comida.";
+
+        AtualizarInterface();
+    }
+
+    public Morador ObterMorador(int indice)
+    {
+        return moradores[indice];
+    }
+
+    public void DefinirTarefa(int indice, bool buscarComida)
+    {
+        if (indice < 0 || indice >= moradores.Length)
+        {
+            return;
+        }
+
+        moradores[indice].BuscandoComida = buscarComida;
+        EstadoAtualizado?.Invoke();
     }
 
     public void EncerrarDia()
     {
         int diaEncerrado = dia;
-        int comidaConsumida = Mathf.Min(comida, moradores);
-        int moradoresSemComida = moradores - comidaConsumida;
+        int pessoasEmBusca = 0;
+
+        foreach (Morador morador in moradores)
+        {
+            if (morador.BuscandoComida)
+            {
+                pessoasEmBusca++;
+            }
+        }
+
+        int comidaColetada = pessoasEmBusca * comidaPorBusca;
+
+        // As buscas são resolvidas antes da alimentação.
+        comida += comidaColetada;
+
+        int comidaConsumida = Mathf.Min(comida, moradores.Length);
+        int moradoresSemComida = moradores.Length - comidaConsumida;
 
         comida -= comidaConsumida;
         dia++;
 
         textoRelatorio.text =
             $"Fim do dia {diaEncerrado}\n\n" +
-            $"Comida consumida: {comidaConsumida}\n" +
-            $"Comida restante: {comida}";
+            $"Moradores em busca: {pessoasEmBusca}\n" +
+            $"Comida coletada: +{comidaColetada}\n" +
+            $"Comida consumida: -{comidaConsumida}\n" +
+            $"Estoque final: {comida}";
 
         if (moradoresSemComida > 0)
         {
             textoRelatorio.text +=
-                $"\n\nAtenção: {moradoresSemComida} moradores " +
-                "ficaram sem comida.";
+                $"\n\nAtenção: {moradoresSemComida} " +
+                "moradores ficaram sem comida.";
         }
 
         AtualizarInterface();
@@ -50,6 +99,8 @@ public class GameManager : MonoBehaviour
     {
         textoDia.text = $"Dia: {dia}";
         textoComida.text = $"Comida: {comida}";
-        textoMoradores.text = $"Moradores: {moradores}";
+        textoMoradores.text = $"Moradores: {moradores.Length}";
+
+        EstadoAtualizado?.Invoke();
     }
 }
