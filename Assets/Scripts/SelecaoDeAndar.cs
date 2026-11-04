@@ -108,20 +108,16 @@ public class SelecaoDeAndar : MonoBehaviour
         Morador primeiro = gameManager.ObterMorador(primeiroIndice);
         Morador segundo = gameManager.ObterMorador(primeiroIndice + 1);
 
-        textoBotaoMorador1.text =
-            $"{primeiro.Nome} — {primeiro.NomeDaTarefa()}";
-
-        textoBotaoMorador2.text =
-            $"{segundo.Nome} — {segundo.NomeDaTarefa()}";
+        textoBotaoMorador1.text = $"{primeiro.Nome} | Energia: {primeiro.Energia}\n" + primeiro.NomeDaTarefa();
+        textoBotaoMorador2.text = $"{segundo.Nome} | Energia: {segundo.Energia}\n" + segundo.NomeDaTarefa();
 
         if (temMorador)
         {
             Morador selecionado =
                 gameManager.ObterMorador(indiceMoradorSelecionado);
 
-            textoDetalhesAndar.text =
-                $"{selecionado.Andar}º andar | {selecionado.Nome}\n" +
-                $"Tarefa: {selecionado.NomeDaTarefa()}";
+            textoDetalhesAndar.text = $"{selecionado.Andar}º andar | {selecionado.Nome}\n" + $"Energia: {selecionado.Energia}/100\n" + $"Tarefa: {selecionado.NomeDaTarefa()}";
+            botaoBuscarComida.interactable = selecionado.Energia >= 25;
         }
         else
         {

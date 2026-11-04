@@ -44,30 +44,38 @@ public class GameManager : MonoBehaviour
     }
 
     public void DefinirTarefa(int indice, bool buscarComida)
+{
+    if (indice < 0 || indice >= moradores.Length)
     {
-        if (indice < 0 || indice >= moradores.Length)
-        {
-            return;
-        }
-
-        moradores[indice].BuscandoComida = buscarComida;
-        EstadoAtualizado?.Invoke();
+        return;
     }
+
+    Morador morador = moradores[indice];
+
+    if (buscarComida && morador.Energia < 25)
+    {
+        return;
+    }
+
+    morador.BuscandoComida = buscarComida;
+    EstadoAtualizado?.Invoke();
+}
 
     public void EncerrarDia()
     {
         int diaEncerrado = dia;
-        int pessoasEmBusca = 0;
+int pessoasEmBusca = 0;
+int comidaColetada = 0;
 
-        foreach (Morador morador in moradores)
-        {
-            if (morador.BuscandoComida)
-            {
-                pessoasEmBusca++;
-            }
-        }
+foreach (Morador morador in moradores)
+{
+    if (morador.BuscandoComida && morador.Energia >= 25)
+    {
+        pessoasEmBusca++;
+    }
 
-        int comidaColetada = pessoasEmBusca * comidaPorBusca;
+    comidaColetada += morador.ResolverDia(comidaPorBusca);
+}
 
         // As buscas são resolvidas antes da alimentação.
         comida += comidaColetada;
