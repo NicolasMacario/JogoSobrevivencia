@@ -1,7 +1,9 @@
 public enum TarefaMorador
 {
     Descansar,
-    BuscarComida
+    BuscarComida,
+    BuscarMateriais,
+    RepararBarricada
 }
 
 public class Morador
@@ -31,28 +33,36 @@ public class Morador
             case TarefaMorador.BuscarComida:
                 return "Buscar comida";
 
+            case TarefaMorador.BuscarMateriais:
+                return "Buscar materiais";
+
+            case TarefaMorador.RepararBarricada:
+                return "Reparar barricada";
+
             default:
                 return "Descansar";
         }
     }
 
-    public int ResolverDia(int comidaPorBusca)
+    public bool Trabalhar()
     {
-        if (Tarefa == TarefaMorador.BuscarComida && Energia >= 25)
+        if (Energia < 25)
         {
-            Energia -= 25;
-
-            if (Energia < 25)
-            {
-                Tarefa = TarefaMorador.Descansar;
-            }
-
-            return comidaPorBusca;
+            return false;
         }
 
-        Tarefa = TarefaMorador.Descansar;
-        Energia = System.Math.Min(100, Energia + 50);
+        Energia -= 25;
 
-        return 0;
+        if (Energia < 25)
+        {
+            Tarefa = TarefaMorador.Descansar;
+        }
+
+        return true;
+    }
+
+    public void Descansar()
+    {
+        Energia = System.Math.Min(100, Energia + 50);
     }
 }

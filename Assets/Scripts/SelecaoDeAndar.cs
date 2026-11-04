@@ -19,6 +19,8 @@ public class SelecaoDeAndar : MonoBehaviour
     [Header("Botões das tarefas")]
     [SerializeField] private Button botaoBuscarComida;
     [SerializeField] private Button botaoDescansar;
+    [SerializeField] private Button botaoBuscarMateriais;
+    [SerializeField] private Button botaoRepararBarricada;
 
     private int andarSelecionado = 0;
     private int indiceMoradorSelecionado = -1;
@@ -76,6 +78,31 @@ public class SelecaoDeAndar : MonoBehaviour
         TarefaMorador.BuscarComida
     );
 }
+public void BuscarMateriais()
+{
+    if (indiceMoradorSelecionado < 0)
+    {
+        return;
+    }
+
+    gameManager.DefinirTarefa(
+        indiceMoradorSelecionado,
+        TarefaMorador.BuscarMateriais
+    );
+}
+
+public void RepararBarricada()
+{
+    if (indiceMoradorSelecionado < 0)
+    {
+        return;
+    }
+
+    gameManager.DefinirTarefa(
+        indiceMoradorSelecionado,
+        TarefaMorador.RepararBarricada
+    );
+}
 
 public void Descansar()
 {
@@ -100,6 +127,8 @@ public void Descansar()
 
         botaoBuscarComida.interactable = temMorador;
         botaoDescansar.interactable = temMorador;
+        botaoBuscarMateriais.interactable = temMorador;
+        botaoRepararBarricada.interactable = temMorador;
 
         if (!temAndar)
         {
@@ -124,6 +153,8 @@ public void Descansar()
 
             textoDetalhesAndar.text = $"{selecionado.Andar}º andar | {selecionado.Nome}\n" + $"Energia: {selecionado.Energia}/100\n" + $"Tarefa: {selecionado.NomeDaTarefa()}";
             botaoBuscarComida.interactable = selecionado.Energia >= 25;
+            botaoBuscarMateriais.interactable = selecionado.Energia >= 25;
+            botaoRepararBarricada.interactable = selecionado.Energia >= 25;
         }
         else
         {
