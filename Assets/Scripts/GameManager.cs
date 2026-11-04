@@ -1,6 +1,7 @@
 using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -29,6 +30,13 @@ public class GameManager : MonoBehaviour
 
     public event Action EstadoAtualizado;
 
+    [Header("Fim da partida")]
+    [SerializeField] private int diasParaVencer = 15;
+    [SerializeField] private int limiteDiasComFome = 3;
+    [SerializeField] private Button botaoEncerrarDia;
+
+    private int diasSeguidosComFome = 0;
+    private bool partidaEncerrada = false;
     private void Start()
     {
         textoRelatorio.text =
@@ -45,6 +53,10 @@ public class GameManager : MonoBehaviour
 
     public void DefinirTarefa(int indice, bool buscarComida)
 {
+    if (partidaEncerrada)
+    {
+        return;
+    }
     if (indice < 0 || indice >= moradores.Length)
     {
         return;
@@ -59,49 +71,92 @@ public class GameManager : MonoBehaviour
 
     morador.BuscandoComida = buscarComida;
     EstadoAtualizado?.Invoke();
+    
 }
 
     public void EncerrarDia()
-    {
-        int diaEncerrado = dia;
-int pessoasEmBusca = 0;
-int comidaColetada = 0;
-
-foreach (Morador morador in moradores)
 {
-    if (morador.BuscandoComida && morador.Energia >= 25)
+    if (partidaEncerrada)
     {
-        pessoasEmBusca++;
+        return;
     }
 
-    comidaColetada += morador.ResolverDia(comidaPorBusca);
-}
+    int diaEncerrado = dia;
+    int pessoasEmBusca = 0;
+    int comidaColetada = 0;
 
-        // As buscas são resolvidas antes da alimentação.
-        comida += comidaColetada;
-
-        int comidaConsumida = Mathf.Min(comida, moradores.Length);
-        int moradoresSemComida = moradores.Length - comidaConsumida;
-
-        comida -= comidaConsumida;
-        dia++;
-
-        textoRelatorio.text =
-            $"Fim do dia {diaEncerrado}\n\n" +
-            $"Moradores em busca: {pessoasEmBusca}\n" +
-            $"Comida coletada: +{comidaColetada}\n" +
-            $"Comida consumida: -{comidaConsumida}\n" +
-            $"Estoque final: {comida}";
-
-        if (moradoresSemComida > 0)
+    foreach (Morador morador in moradores)
+    {
+        if (morador.BuscandoComida && morador.Energia >= 25)
         {
-            textoRelatorio.text +=
-                $"\n\nAtenção: {moradoresSemComida} " +
-                "moradores ficaram sem comida.";
+            pessoasEmBusca++;
         }
 
-        AtualizarInterface();
+        comidaColetada += morador.ResolverDia(comidaPorBusca);
     }
+
+    comida += comidaColetada;
+
+    int comidaConsumida = Mathf.Min(comida, moradores.Length);
+    int moradoresSemComida = moradores.Length - comidaConsumida;
+
+    comida -= comidaConsumida;
+
+    if (moradoresSemComida > 0)
+    {
+        diasSeguidosComFome++;
+    }
+    else
+    {
+        diasSeguidosComFome = 0;
+    }
+
+    textoRelatorio.text =
+        $"Fim do dia {diaEncerrado}\n\n" +
+        $"Moradores em busca: {pessoasEmBusca}\n" +
+        $"Comida coletada: +{comidaColetada}\n" +
+        $"Comida consumida: -{comidaConsumida}\n" +
+        $"Estoque final: {comida}\n" +
+        $"Dias seguidos com fome: " +
+        $"{diasSeguidosComFome}/{limiteDiasComFome}";
+
+    // A sobrevivência é verificada antes da vitória.
+    if (diasSeguidosComFome >= limiteDiasComFome)
+    {
+        FinalizarPartida(false);
+    }
+    else if (diaEncerrado >= diasParaVencer)
+    {
+        FinalizarPartida(true);
+    }
+    else
+    {
+        dia++;
+    }
+
+    AtualizarInterface();
+}
+private void FinalizarPartida(bool venceu)
+{
+    partidaEncerrada = true;
+    botaoEncerrarDia.interactable = false;
+
+    if (venceu)
+    {
+        textoRelatorio.text =
+            $"VITÓRIA!\n\n" +
+            $"A comunidade sobreviveu por {diasParaVencer} dias.\n\n" +
+            $"Comida restante: {comida}";
+    }
+    else
+    {
+        textoRelatorio.text =
+            $"DERROTA\n\n" +
+            $"A comunidade passou {limiteDiasComFome} dias " +
+            "consecutivos sem comida suficiente.\n\n" +
+            $"Último dia: {dia}";
+    }
+}
 
     private void AtualizarInterface()
     {

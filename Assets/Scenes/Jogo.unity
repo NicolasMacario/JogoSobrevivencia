@@ -2770,6 +2770,9 @@ MonoBehaviour:
   textoComida: {fileID: 1832989980}
   textoMoradores: {fileID: 1981682112}
   textoRelatorio: {fileID: 697463971}
+  diasParaVencer: 15
+  limiteDiasComFome: 3
+  botaoEncerrarDia: {fileID: 1485293911}
 --- !u!114 &1761574545
 MonoBehaviour:
   m_ObjectHideFlags: 0
