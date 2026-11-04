@@ -17,6 +17,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TMP_Text textoComida;
     [SerializeField] private TMP_Text textoMoradores;
     [SerializeField] private TMP_Text textoRelatorio;
+    [Header("Conflitos")]
+    [SerializeField] private GerenciadorDeConflitos gerenciadorDeConflitos;
 
     private Morador[] moradores =
     {
@@ -27,6 +29,23 @@ public class GameManager : MonoBehaviour
         new Morador("Eva", 3),
         new Morador("Felipe", 3)
     };
+    public bool TemComida(int quantidade)
+{
+    return comida >= quantidade;
+}
+
+public bool TentarGastarComida(int quantidade)
+{
+    if (partidaEncerrada || quantidade < 0 || comida < quantidade)
+    {
+        return false;
+    }
+
+    comida -= quantidade;
+    AtualizarInterface();
+
+    return true;
+}
 
     public event Action EstadoAtualizado;
 
@@ -53,10 +72,10 @@ public class GameManager : MonoBehaviour
 
     public void DefinirTarefa(int indice, bool buscarComida)
 {
-    if (partidaEncerrada)
-    {
-        return;
-    }
+    if (partidaEncerrada || gerenciadorDeConflitos.EventoPendente)
+{
+    return;
+}
     if (indice < 0 || indice >= moradores.Length)
     {
         return;
@@ -76,10 +95,10 @@ public class GameManager : MonoBehaviour
 
     public void EncerrarDia()
 {
-    if (partidaEncerrada)
-    {
-        return;
-    }
+    if (partidaEncerrada || gerenciadorDeConflitos.EventoPendente)
+{
+    return;
+}
 
     int diaEncerrado = dia;
     int pessoasEmBusca = 0;
@@ -135,6 +154,10 @@ public class GameManager : MonoBehaviour
     }
 
     AtualizarInterface();
+    if (!partidaEncerrada)
+{
+    gerenciadorDeConflitos.VerificarEvento(diaEncerrado);
+}
 }
 private void FinalizarPartida(bool venceu)
 {
