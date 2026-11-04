@@ -65,24 +65,30 @@ public class SelecaoDeAndar : MonoBehaviour
     }
 
     public void BuscarComida()
+{
+    if (indiceMoradorSelecionado < 0)
     {
-        if (indiceMoradorSelecionado < 0)
-        {
-            return;
-        }
-
-        gameManager.DefinirTarefa(indiceMoradorSelecionado, true);
+        return;
     }
 
-    public void Descansar()
-    {
-        if (indiceMoradorSelecionado < 0)
-        {
-            return;
-        }
+    gameManager.DefinirTarefa(
+        indiceMoradorSelecionado,
+        TarefaMorador.BuscarComida
+    );
+}
 
-        gameManager.DefinirTarefa(indiceMoradorSelecionado, false);
+public void Descansar()
+{
+    if (indiceMoradorSelecionado < 0)
+    {
+        return;
     }
+
+    gameManager.DefinirTarefa(
+        indiceMoradorSelecionado,
+        TarefaMorador.Descansar
+    );
+}
 
     private void AtualizarPainel()
     {

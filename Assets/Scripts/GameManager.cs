@@ -70,12 +70,13 @@ public bool TentarGastarComida(int quantidade)
         return moradores[indice];
     }
 
-    public void DefinirTarefa(int indice, bool buscarComida)
+    public void DefinirTarefa(int indice, TarefaMorador tarefa)
 {
     if (partidaEncerrada || gerenciadorDeConflitos.EventoPendente)
-{
-    return;
-}
+    {
+        return;
+    }
+
     if (indice < 0 || indice >= moradores.Length)
     {
         return;
@@ -83,14 +84,13 @@ public bool TentarGastarComida(int quantidade)
 
     Morador morador = moradores[indice];
 
-    if (buscarComida && morador.Energia < 25)
+    if (tarefa != TarefaMorador.Descansar && morador.Energia < 25)
     {
         return;
     }
 
-    morador.BuscandoComida = buscarComida;
+    morador.DefinirTarefa(tarefa);
     EstadoAtualizado?.Invoke();
-    
 }
 
     public void EncerrarDia()
@@ -106,7 +106,7 @@ public bool TentarGastarComida(int quantidade)
 
     foreach (Morador morador in moradores)
     {
-        if (morador.BuscandoComida && morador.Energia >= 25)
+        if (morador.Tarefa == TarefaMorador.BuscarComida && morador.Energia >= 25)
         {
             pessoasEmBusca++;
         }
