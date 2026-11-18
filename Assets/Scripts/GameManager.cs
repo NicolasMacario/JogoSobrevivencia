@@ -120,8 +120,7 @@ public class GameManager : MonoBehaviour
         int reparadoresDescansaram = 0;
 
         // Guarda as tarefas antes de alguém gastar energia.
-        TarefaMorador[] tarefasDoDia =
-            new TarefaMorador[moradores.Length];
+        TarefaMorador[] tarefasDoDia = new TarefaMorador[moradores.Length];
 
         for (int i = 0; i < moradores.Length; i++)
         {
@@ -148,7 +147,7 @@ public class GameManager : MonoBehaviour
 
             if (tarefa == TarefaMorador.BuscarComida)
             {
-                comidaColetada += comidaPorBusca;
+                comidaColetada += ObterRendimentoDeComida(moradores[i]);
             }
             else
             {
@@ -289,5 +288,17 @@ public class GameManager : MonoBehaviour
         barraBarricada.value = resistencia;
 
         EstadoAtualizado?.Invoke();
+    }
+    public int ObterRendimentoDeComida(Morador morador)
+    {
+        bool baixaConfianca =
+            gerenciadorDeConflitos.EstaComBaixaConfianca(morador.Andar);
+
+        if (baixaConfianca)
+        {
+            return comidaPorBusca / 2;
+        }
+
+        return comidaPorBusca;
     }
 }

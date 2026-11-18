@@ -101,14 +101,36 @@ public class GerenciadorDeConflitos : MonoBehaviour
     }
 
     private void AtualizarTextosDosAndares()
+{
+    textoAndar1.text = MontarTextoDoAndar(1);
+    textoAndar2.text = MontarTextoDoAndar(2);
+    textoAndar3.text = MontarTextoDoAndar(3);
+}
+
+private string MontarTextoDoAndar(int numeroAndar)
+{
+    int indice = numeroAndar - 1;
+
+    string texto =
+        $"{numeroAndar}º andar — 2 moradores\n" +
+        $"Confiança: {confianca[indice]}/100";
+
+    if (EstaComBaixaConfianca(numeroAndar))
     {
-        textoAndar1.text =
-            $"1º andar — 2 moradores\nConfiança: {confianca[0]}/100";
+        texto += "\nColeta de comida reduzida";
+    }
 
-        textoAndar2.text =
-            $"2º andar — 2 moradores\nConfiança: {confianca[1]}/100";
+    return texto;
+    }
+    public bool EstaComBaixaConfianca(int numeroAndar)
+    {
+        int indice = numeroAndar - 1;
 
-        textoAndar3.text =
-            $"3º andar — 2 moradores\nConfiança: {confianca[2]}/100";
+        if (indice < 0 || indice >= confianca.Length)
+        {
+            return false;
+        }
+
+        return confianca[indice] < 40;
     }
 }

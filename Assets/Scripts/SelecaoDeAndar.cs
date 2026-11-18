@@ -151,7 +151,14 @@ public void Descansar()
             Morador selecionado =
                 gameManager.ObterMorador(indiceMoradorSelecionado);
 
-            textoDetalhesAndar.text = $"{selecionado.Andar}º andar | {selecionado.Nome}\n" + $"Energia: {selecionado.Energia}/100\n" + $"Tarefa: {selecionado.NomeDaTarefa()}";
+            int rendimento =
+    gameManager.ObterRendimentoDeComida(selecionado);
+
+            textoDetalhesAndar.text =
+            $"{selecionado.Andar}º andar | {selecionado.Nome}\n" +
+            $"Energia: {selecionado.Energia}/100\n" +
+            $"Tarefa: {selecionado.NomeDaTarefa()}\n" +
+            $"Busca de comida: {rendimento} por dia";
             botaoBuscarComida.interactable = selecionado.Energia >= 25;
             botaoBuscarMateriais.interactable = selecionado.Energia >= 25;
             botaoRepararBarricada.interactable = selecionado.Energia >= 25;
