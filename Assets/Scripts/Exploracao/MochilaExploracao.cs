@@ -39,6 +39,19 @@ public sealed class MochilaExploracao : MonoBehaviour
         Materiais = 0;
         AtualizarVisor();
     }
+    public void SerAlcancadoPorZumbi()
+    {
+        var retornar = aoVoltarAoAbrigo;
+
+        if (retornar == null)
+        {
+            return;
+        }
+
+        Esvaziar();
+        Debug.Log("O zumbi alcançou você. A coleta da expedição foi perdida.");
+        retornar(this);
+    }
 
     private bool EscadaAoAlcance()
     {
@@ -166,5 +179,27 @@ public sealed class MochilaExploracao : MonoBehaviour
 
         return $"E para pegar {armarioProximo.NomeDoRecurso}  ·  " +
             $"{armarioProximo.UnidadesRestantes} no armário";
+    }
+    private Vector3 posicaoInicial;
+
+    private void Awake()
+    {
+        posicaoInicial = transform.position;
+    }
+
+    public void ReposicionarNaEntrada()
+    {
+        Rigidbody2D corpo = GetComponent<Rigidbody2D>();
+
+        transform.position = posicaoInicial;
+        Physics2D.SyncTransforms();
+
+    #if UNITY_6000_0_OR_NEWER
+        corpo.linearVelocity = Vector2.zero;
+    #else
+        corpo.velocity = Vector2.zero;
+    #endif
+
+        corpo.angularVelocity = 0f;
     }
 }

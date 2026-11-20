@@ -92,6 +92,10 @@ public class ExpedicaoDoAbrigo : MonoBehaviour
 
         SceneManager.SetActiveScene(cenaDoAndar);
         ReativarObjetos(objetosDoAndar);
+        SceneManager.SetActiveScene(cenaDoAndar);
+        ReativarObjetos(objetosDoAndar);
+        mochilaAtiva.ReposicionarNaEntrada();
+        mochilaAtiva.VincularRetorno(VoltarAoAbrigo);
         mochilaAtiva.VincularRetorno(VoltarAoAbrigo);
     }
 
