@@ -19,6 +19,37 @@ public sealed class MochilaExploracao : MonoBehaviour
     public int Comida { get; private set; }
     public int Materiais { get; private set; }
     public int Total => Comida + Materiais;
+    [SerializeField] private Transform escadaDeRetorno;
+
+    private Action<MochilaExploracao> aoVoltarAoAbrigo;
+    private bool pertoDaEscada;
+
+    public bool TemEscadaDeRetorno => escadaDeRetorno != null;
+
+    public void VincularRetorno(Action<MochilaExploracao> acao)
+    {
+        aoVoltarAoAbrigo = acao;
+        pertoDaEscada = EscadaAoAlcance();
+        AtualizarVisor();
+    }
+
+    public void Esvaziar()
+    {
+        Comida = 0;
+        Materiais = 0;
+        AtualizarVisor();
+    }
+
+    private bool EscadaAoAlcance()
+    {
+        if (aoVoltarAoAbrigo == null || escadaDeRetorno == null)
+        {
+            return false;
+        }
+
+        Vector2 distancia = (Vector2)(escadaDeRetorno.position - transform.position);
+        return distancia.sqrMagnitude <= alcance * alcance;
+    }
 
     private void Start()
     {
@@ -29,19 +60,27 @@ public sealed class MochilaExploracao : MonoBehaviour
     private void Update()
     {
         ArmarioExploracao alvo = EncontrarArmarioProximo();
+        bool podeVoltar = EscadaAoAlcance();
 
-        if (!ReferenceEquals(alvo, armarioProximo))
+        if (!ReferenceEquals(alvo, armarioProximo) || podeVoltar != pertoDaEscada)
         {
             armarioProximo = alvo;
+            pertoDaEscada = podeVoltar;
             AtualizarVisor();
         }
 
-        if (alvo == null || Total >= capacidade || !PressionouInteracao())
+        if (!PressionouInteracao())
         {
             return;
         }
 
-        if (!alvo.TentarRetirarUnidade())
+        if (pertoDaEscada)
+        {
+            aoVoltarAoAbrigo(this);
+            return;
+        }
+
+        if (alvo == null || Total >= capacidade || !alvo.TentarRetirarUnidade())
         {
             return;
         }
@@ -106,10 +145,14 @@ public sealed class MochilaExploracao : MonoBehaviour
 
     private string ObterInstrucao()
     {
+        if (pertoDaEscada)
+            {
+                return "E para voltar ao abrigo";
+            }
         if (Total >= capacidade)
-        {
-            return "Mochila cheia.";
-        }
+            {
+                return "Mochila cheia.";
+            }
 
         if (armarioProximo == null)
         {

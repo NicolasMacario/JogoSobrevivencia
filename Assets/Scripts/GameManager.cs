@@ -301,4 +301,17 @@ public class GameManager : MonoBehaviour
 
         return comidaPorBusca;
     }
+    public bool PodeIniciarExpedicao()
+    {
+        return !partidaEncerrada &&
+            (gerenciadorDeConflitos == null ||
+                !gerenciadorDeConflitos.EventoPendente);
+    }
+
+    public void ReceberColetaDaExpedicao(int comidaColetada, int materiaisColetados)
+    {
+        comida += Mathf.Max(0, comidaColetada);
+        materiais += Mathf.Max(0, materiaisColetados);
+        AtualizarInterface();
+    }
 }
